@@ -7,7 +7,10 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node src/server.js",
-    "dev": "nodemon src/server.js"
+    "dev": "nodemon src/server.js",
+    "build:schema": "node scripts/buildSchema.js",
+    "prisma:generate": "npm run build:schema && npx prisma generate",
+    "migrate": "prisma migrate dev --name init_movie_schema"
   },
   "keywords": [],
   "author": "",
