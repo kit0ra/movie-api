@@ -1,0 +1,18 @@
+model Movie {
+    id Int @id @default(autoincrement())
+    imdb_id String @unique
+    tmdb_id Int @unique
+    title String
+    budget Int
+    homepage String
+    overview String
+    popularity Float
+    release_date DateTime
+    revenue Int
+    runtime Int
+    movie_status String
+    tagline String
+    votes_avg Float
+    votes_count Int
+    genres  Movie_Genre[]
+}

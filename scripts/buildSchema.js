@@ -1,8 +1,8 @@
 import fs from 'fs'
 import path from 'path'
 
-const modelsDir = path.join(__dirname, '../src/models/')
-const schemaPath = path.join(__dirname, '../src/prisma/schema.prisma')
+const modelsRootPath = path.join(__dirname, '..', 'prisma', 'models')
+const schemaOutputPath = path.join(__dirname, '..', 'prisma', 'schema.prisma')
 
 const schemaHeader = `
 datasource db {
@@ -15,12 +15,26 @@ generator client {
 }
 `
 
-const modelFiles = fs
-  .readdirSync(modelsDir)
-  .filter(file => file.endsWith('.prisma'))
-  .map(file => fs.readFileSync(path.join(modelsDir, file), 'utf-8'))
+function getPrismaFiles(dir) {
+  let files = []
+
+  fs.readdirSync(dir).forEach(file => {
+    let fullPath = path.join(dir, file)
+    if (fs.statSync(fullPath).isDirectory()) {
+      files = files.concat(getPrismaFiles(fullPath))
+    } else if (path.extname(fullPath) === '.prisma') {
+      files.push(fullPath)
+    }
+  })
+
+  return files
+}
+
+const prismaFiles = getPrismaFiles(modelsRootPath)
+const combinedPrismaContent = prismaFiles
+  .map(file => fs.readFileSync(file, 'utf8'))
   .join('\n')
 
-fs.writeFileSync(schemaPath, schemaHeader + '\n' + modelFiles)
+fs.writeFileSync(schemaOutputPath, schemaHeader + '\n' + combinedPrismaContent)
 
 console.log('schema.prisma has been successfully generated!')
